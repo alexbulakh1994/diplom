@@ -25,7 +25,7 @@ def calculateModelParameters(data, parameterNumber, paramIndex):
         'x': np.arange(0, parameters.shape[0], 1)
     }
 
-def calculateOptimalShift(data, parameterNumber, paramIndex):
+def calcOptimalShiftParams(data, parameterNumber, paramIndex, plot_type):
     parameters =  calculateModelParameters(data, parameterNumber, paramIndex)['y']
     parameterInterval = 12
 
@@ -40,18 +40,35 @@ def calculateOptimalShift(data, parameterNumber, paramIndex):
 
     y_interp = scipy.interpolate.interp1d(X_t, Y_t)
     Y = y_interp(np.arange(0, 165, 1))
+    return findShiftParameters(parameters, Y,plot_type)
+
+def findShiftParameters(Y_data, X_data, plot_type):
+    shiftInterval = 6
+    shiftRange = np.arange(0,48,shiftInterval)
+    errorRange = np.zeros(len(shiftRange))
 
     data = {
-        'y': parameters,
-        'x': Y
+        'y': Y_data,
+        'x': X_data
     }
 
-    paramIndentityFactory = interpolate.FunctionIndenfy(data)
-    params = paramIndentityFactory.LinearParamIndentify()
-    func_values = paramIndentityFactory.calcLinearFuncValues(params)
-    print func_values
+    paramIndentityFactory = interpolate.FunctionIndenfy(data, 0)
+    zeroShiftParams = paramIndentityFactory.LinearParamIndentify(plot_type)
 
-    data['predict_y'] = func_values
+    print 'plot type is : ' + str(plot_type)
+
+    if plot_type == 0:
+        data['predict_y'] = paramIndentityFactory.calcLinearFuncValues(zeroShiftParams)
+    else:
+        data['predict_y'] = paramIndentityFactory.calcNonLinearFuncValues(zeroShiftParams)
+
+    for shift in shiftRange:
+        paramIndentityFactory = interpolate.FunctionIndenfy(data, shift)
+        currParam = paramIndentityFactory.LinearParamIndentify(plot_type)
+        errorRange[shift/shiftInterval] = paramIndentityFactory.Error(currParam, 0)
+
+    print errorRange
+    data['errors'] = errorRange
     return data
 
 
