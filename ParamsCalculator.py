@@ -52,23 +52,23 @@ def findShiftParameters(Y_data, X_data, plot_type):
         'x': X_data
     }
 
-    paramIndentityFactory = interpolate.FunctionIndenfy(data, 0)
-    zeroShiftParams = paramIndentityFactory.LinearParamIndentify(plot_type)
+    for shift in shiftRange:
+        paramIndentityFactory = interpolate.FunctionIndenfy(data, shift)
+        currParam = paramIndentityFactory.LinearParamIndentify(plot_type)
+        errorRange[shift/shiftInterval] = paramIndentityFactory.Error(currParam, plot_type)
+
+    data['errors'] = errorRange
+    minErrorIndex = np.argmin(errorRange)
+
+    paramIndentityFactory = interpolate.FunctionIndenfy(data, minErrorIndex)
+    minShiftParams = paramIndentityFactory.LinearParamIndentify(plot_type)
 
     print 'plot type is : ' + str(plot_type)
 
     if plot_type == 0:
-        data['predict_y'] = paramIndentityFactory.calcLinearFuncValues(zeroShiftParams)
+        data['predict_y'] = minShiftParams[0] + minShiftParams[1] * X_data
     else:
-        data['predict_y'] = paramIndentityFactory.calcNonLinearFuncValues(zeroShiftParams)
-
-    for shift in shiftRange:
-        paramIndentityFactory = interpolate.FunctionIndenfy(data, shift)
-        currParam = paramIndentityFactory.LinearParamIndentify(plot_type)
-        errorRange[shift/shiftInterval] = paramIndentityFactory.Error(currParam, 0)
-
-    print errorRange
-    data['errors'] = errorRange
+        data['predict_y'] = np.exp(minShiftParams[0] + minShiftParams[1] * X_data)
     return data
 
 

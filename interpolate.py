@@ -12,13 +12,13 @@ class FunctionIndenfy(object):
 
     def func(self, param):
         m = self.X_data.shape[0]
-        crossValidSize = m*0.6
-        return np.sum((np.dot(self.X_data[0:crossValidSize,:], param.T) - self.Y_data[0:crossValidSize])**2)/2*m
+        crossValidSize = m*0.8
+        return np.sum((np.dot(self.X_data[0:crossValidSize,:], param.T) - self.Y_data[0:crossValidSize])**2)/(2*crossValidSize)
 
     def NonLinearfunc(self, param):
         m = self.X_data.shape[0]
-        crossValidSize = m*0.6
-        return np.sum((np.dot(self.X_data[0:crossValidSize,:], param.T) - np.log(self.Y_data[0:crossValidSize]))**2)/2*m + (1/m)*np.sum(param**2)
+        crossValidSize = m*0.8
+        return np.sum((np.dot(self.X_data[0:crossValidSize,:], param.T) - np.log(self.Y_data[0:crossValidSize]))**2)/(2*crossValidSize)
 
     def calcLinearFuncValues(self, params):
         return params[0] + params[1]*self.X_data[:,1]
@@ -29,9 +29,10 @@ class FunctionIndenfy(object):
     def Error(self, params, type):
         if type == 0:
             regressionValues = self.calcLinearFuncValues(params)
-
-        data =  np.sum((self.Y_data - regressionValues)**2)
-        return data
+            return  (np.sum((self.Y_data - regressionValues)**2)) / (2 * len(self.Y_data))
+        else:
+            regressionValues = self.calcNonLinearFuncValues(params)
+            return np.sum((self.Y_data - regressionValues) ** 2) / (2 * len(self.Y_data))
 
     def LinearParamIndentify(self, plot_type):
         X = np.zeros([self.X_data.shape[0], 2])
