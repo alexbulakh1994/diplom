@@ -52,7 +52,8 @@ class MainWidget(QtGui.QWidget):
     def showgraph(self):
         active_radioBtn_index = self.mood_button_group.checkedId()
         active_comboBox_index = self.cb.currentIndex()
-        dialog = graphDialog.Dialog(active_radioBtn_index, active_comboBox_index)
+        active_comboBox_Text = self.cb.currentText()
+        dialog = graphDialog.Dialog(active_radioBtn_index, active_comboBox_index, active_comboBox_Text)
         dialog.exec_()
 
     def radio_button_clicked(self):
@@ -123,13 +124,16 @@ class MainWidget(QtGui.QWidget):
 
         label = QtGui.QLabel(u"Параметри:", self)
         self.cb = QtGui.QComboBox()
-        self.cb.addItems([u"Кількість офіційно зареєстрованих нових випадків ВІЛ-інфекції",
-                     u"Кількість нових випадків СНІД",
-                     u"Кількість померлих від СНІД",
-                     u"Кількість офіційно зареєстрованих випадків ВІЛ-інфекції",
-                     u"Кількість випадків СНІД",
-                     u"Кількість померлих від СНІД"
-                     ])
+        self.cb.addItems([u"Швидкість передачі ВІЛ-інфекції серед дітей",
+                          u"Швидкість передачі ВІЛ-інфекції серед дорослих",
+                          u"Швидкість передачі ВІЛ-інфекції серед СІН осіб",
+                          u"Швидкість переходу зі стану ВІЛ-інфікований до стану СНІД серед дітей",
+                          u"Швидкість переходу зі стану ВІЛ-інфікований до стану СНІД серед дорослих",
+                          u"Швидкість переходу зі стану ВІЛ-інфікований до стану СНІД серед СІН",
+                          u"Смертність серед СНІД інфікованих дітей",
+                          u"Смертність серед СНІД інфікованих дорослих",
+                          u"Смертність серед СНІД інфікованих СІН",
+                          u"Швидікість притоку населення в України"])
         self.cb.resize(self.cb.sizeHint())
 
         self.editor.addWidget(label)

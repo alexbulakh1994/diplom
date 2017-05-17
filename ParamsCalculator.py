@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.interpolate
+from scipy.signal import argrelextrema
 import interpolate
 
 def calculateModelParameters(data, parameterNumber, paramIndex):
@@ -57,18 +58,22 @@ def findShiftParameters(Y_data, X_data, plot_type):
         currParam = paramIndentityFactory.LinearParamIndentify(plot_type)
         errorRange[shift/shiftInterval] = paramIndentityFactory.Error(currParam, plot_type)
 
-    data['errors'] = errorRange
-    minErrorIndex = np.argmin(errorRange)
+    minErrorIndexArray = (argrelextrema(errorRange, np.less))
+    if len(minErrorIndexArray[0]) == 0:
+        minErrorIndex = len(errorRange) - 1
+    else:
+        minErrorIndex = minErrorIndexArray[0][0]
 
     paramIndentityFactory = interpolate.FunctionIndenfy(data, minErrorIndex)
     minShiftParams = paramIndentityFactory.LinearParamIndentify(plot_type)
 
-    print 'plot type is : ' + str(plot_type)
-
+    data['errors'] = minErrorIndex
     if plot_type == 0:
         data['predict_y'] = minShiftParams[0] + minShiftParams[1] * X_data
     else:
         data['predict_y'] = np.exp(minShiftParams[0] + minShiftParams[1] * X_data)
+
+    data['optimal_shift'] = minErrorIndex
     return data
 
 
